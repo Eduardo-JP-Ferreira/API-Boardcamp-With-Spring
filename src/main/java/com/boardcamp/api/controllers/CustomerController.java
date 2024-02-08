@@ -34,7 +34,7 @@ public class CustomerController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Object> getTweetById(@PathVariable("id") Long id) {
+  public ResponseEntity<Object> getCustomersById(@PathVariable("id") Long id) {
     Optional<Optional<CustomerModel>> customer = customerService.findById(id);
 
     if (!customer.isPresent()) {
@@ -45,7 +45,7 @@ public class CustomerController {
   }
 
   @PostMapping
-  public ResponseEntity<Object> createTweet(@RequestBody @Valid CustomerDTO body) {
+  public ResponseEntity<Object> createCustomer(@RequestBody @Valid CustomerDTO body) {
     Optional<CustomerModel> customer = customerService.save(body);
 
     if (!customer.isPresent()) {
