@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class GameDTO {
 
+  public GameDTO(String string, String string2, int i, int j) {
+  }
+
   @NotBlank(message = "Fild name is mandatory")
   private String name;
 

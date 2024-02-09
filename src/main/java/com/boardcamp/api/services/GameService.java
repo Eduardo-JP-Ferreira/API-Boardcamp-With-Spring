@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.boardcamp.api.dtos.GameDTO;
-import com.boardcamp.api.exceptions.CustomerConflictException;
+import com.boardcamp.api.exceptions.GameConflictException;
 import com.boardcamp.api.models.GameModel;
 import com.boardcamp.api.repositories.GameRepository;
 
@@ -24,7 +24,7 @@ public class GameService {
 
   public GameModel save(GameDTO dto) {
     if (gameRepository.existsByName(dto.getName())) {
-      throw new CustomerConflictException("This name Already Exist!");
+      throw new GameConflictException("This name Already Exist!");
     }
     GameModel game = new GameModel(dto);
     return gameRepository.save(game);

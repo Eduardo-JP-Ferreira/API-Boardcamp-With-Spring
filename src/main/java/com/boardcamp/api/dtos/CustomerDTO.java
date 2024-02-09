@@ -7,6 +7,9 @@ import lombok.Data;
 @Data
 public class CustomerDTO {
 
+  public CustomerDTO(String string, String string2) {
+  }
+
   @NotBlank(message = "Fild name is mandatory")
   private String name;
 
