@@ -43,6 +43,12 @@ public class RentalService {
     GameModel gameModel = game.get();
     CustomerModel customerModel = customer.get();
 
+    List<RentalModel> gameRentals = rentalRepository.findByGameId(dto.getGameId());
+
+    if (gameRentals.size() == gameModel.getStockTotal()) {
+      return Optional.empty();
+    }
+
     RentalModel rental = new RentalModel(dto, customerModel, gameModel);
     rental.setOriginalPrice(gameModel.getPricePerDay() * dto.getDaysRented());
     rental.setDelayFee(Long.valueOf(0));
