@@ -9,8 +9,6 @@ import com.boardcamp.api.services.RentalService;
 
 import jakarta.validation.Valid;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,23 +34,13 @@ public class RentalController {
 
   @PostMapping
   public ResponseEntity<Object> createRental(@RequestBody @Valid RentalDTO body) {
-    Optional<RentalModel> rental = rentalService.save(body);
-
-    if (!rental.isPresent()) {
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("CustomerId or GameId invalid");
-    }
-
+    RentalModel rental = rentalService.save(body);
     return ResponseEntity.status(HttpStatus.CREATED).body(rental);
   }
 
   @PutMapping("/{id}/return")
   public ResponseEntity<Object> updateRental(@PathVariable Long id) {
-    Optional<RentalModel> rental = rentalService.update(id);
-
-    if (!rental.isPresent()) {
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("Was not possible finish the rent");
-    }
-
+    RentalModel rental = rentalService.update(id);
     return ResponseEntity.status(HttpStatus.OK).body(rental);
   }
 }

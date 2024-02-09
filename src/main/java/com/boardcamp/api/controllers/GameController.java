@@ -9,8 +9,6 @@ import com.boardcamp.api.services.GameService;
 
 import jakarta.validation.Valid;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,13 +31,8 @@ public class GameController {
   }
 
   @PostMapping
-  public ResponseEntity<Object> createTweet(@RequestBody @Valid GameDTO body) {
-    Optional<GameModel> game = gameService.save(body);
-
-    if (!game.isPresent()) {
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("This Game's Name Already Exist");
-    }
-
+  public ResponseEntity<Object> createGame(@RequestBody @Valid GameDTO body) {
+    GameModel game = gameService.save(body);
     return ResponseEntity.status(HttpStatus.CREATED).body(game);
   }
 }

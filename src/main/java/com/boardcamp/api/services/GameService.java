@@ -1,11 +1,11 @@
 package com.boardcamp.api.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.boardcamp.api.dtos.GameDTO;
+import com.boardcamp.api.exceptions.CustomerConflictException;
 import com.boardcamp.api.models.GameModel;
 import com.boardcamp.api.repositories.GameRepository;
 
@@ -22,11 +22,11 @@ public class GameService {
     return gameRepository.findAll();
   }
 
-  public Optional<GameModel> save(GameDTO dto) {
+  public GameModel save(GameDTO dto) {
     if (gameRepository.existsByName(dto.getName())) {
-      return Optional.empty();
+      throw new CustomerConflictException("This name Already Exist!");
     }
     GameModel game = new GameModel(dto);
-    return Optional.of(gameRepository.save(game));
+    return gameRepository.save(game);
   }
 }

@@ -3,11 +3,15 @@ package com.boardcamp.api.services;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.boardcamp.api.dtos.RentalDTO;
+import com.boardcamp.api.exceptions.CustomerNotFoundException;
+import com.boardcamp.api.exceptions.GameNotFoundException;
+import com.boardcamp.api.exceptions.GameUnprocessableEntityException;
+import com.boardcamp.api.exceptions.RentalNotFoundException;
+import com.boardcamp.api.exceptions.RentalUnprocessableEntityException;
 import com.boardcamp.api.models.CustomerModel;
 import com.boardcamp.api.models.GameModel;
 import com.boardcamp.api.models.RentalModel;
@@ -33,52 +37,44 @@ public class RentalService {
     return rentalRepository.findAll();
   }
 
-  public Optional<RentalModel> save(RentalDTO dto) {
+  public RentalModel save(RentalDTO dto) {
 
-    Optional<CustomerModel> customer = customerRepository.findById(dto.getCustomerId());
-    Optional<GameModel> game = gameRepository.findById(dto.getGameId());
-    if (!customer.isPresent() || !game.isPresent()) {
-      return Optional.empty();
-    }
+    CustomerModel customer = customerRepository.findById(dto.getCustomerId()).orElseThrow(
+        () -> new CustomerNotFoundException("Customer not found by this id!"));
 
-    GameModel gameModel = game.get();
-    CustomerModel customerModel = customer.get();
+    GameModel game = gameRepository.findById(dto.getGameId()).orElseThrow(
+        () -> new GameNotFoundException("Game not found by this id!"));
 
     List<RentalModel> gameRentals = rentalRepository.findByGameIdAndReturnDateIsNull(dto.getGameId());
 
-    if (gameRentals.size() == gameModel.getStockTotal()) {
-      return Optional.empty();
+    if (gameRentals.size() == game.getStockTotal()) {
+      throw new GameUnprocessableEntityException("There is no games avaiable on the stock!");
     }
 
-    RentalModel rental = new RentalModel(dto, customerModel, gameModel);
-    rental.setOriginalPrice(gameModel.getPricePerDay() * dto.getDaysRented());
+    RentalModel rental = new RentalModel(dto, customer, game);
+    rental.setOriginalPrice(game.getPricePerDay() * dto.getDaysRented());
     rental.setDelayFee(Long.valueOf(0));
     rental.setRentDate(LocalDate.now());
 
-    return Optional.of(rentalRepository.save(rental));
+    return rentalRepository.save(rental);
   }
 
-  public Optional<RentalModel> update(Long id) {
+  public RentalModel update(Long id) {
 
-    Optional<RentalModel> rental = rentalRepository.findById(id);
+    RentalModel rental = rentalRepository.findById(id).orElseThrow(
+        () -> new RentalNotFoundException("Rental not found by this id!"));
 
-    if (!rental.isPresent()) {
-      return Optional.empty();
+    if (rental.getReturnDate() != null) {
+      throw new RentalUnprocessableEntityException("This rental is already finished");
     }
 
-    RentalModel rentalModel = rental.get();
+    rental.setReturnDate(LocalDate.now());
 
-    if (rentalModel.getReturnDate() != null) {
-      return Optional.empty();
+    long daysDifference = ChronoUnit.DAYS.between(rental.getRentDate(), LocalDate.now());
+    if (daysDifference > rental.getDaysRented()) {
+      rental.setDelayFee((daysDifference - rental.getDaysRented()) * rental.getGame().getPricePerDay());
     }
 
-    rentalModel.setReturnDate(LocalDate.now());
-
-    long daysDifference = ChronoUnit.DAYS.between(rentalModel.getRentDate(), LocalDate.now());
-    if (daysDifference > rentalModel.getDaysRented()) {
-      rentalModel.setDelayFee((daysDifference - rentalModel.getDaysRented()) * rentalModel.getGame().getPricePerDay());
-    }
-
-    return Optional.of(rentalRepository.save(rentalModel));
+    return rentalRepository.save(rental);
   }
 }

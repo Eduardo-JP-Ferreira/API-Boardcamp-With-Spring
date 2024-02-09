@@ -1,12 +1,12 @@
 package com.boardcamp.api.services;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 import com.boardcamp.api.repositories.CustomerRepository;
 import com.boardcamp.api.dtos.CustomerDTO;
+import com.boardcamp.api.exceptions.CustomerConflictException;
+import com.boardcamp.api.exceptions.CustomerNotFoundException;
 import com.boardcamp.api.models.CustomerModel;
 
 @Service
@@ -22,19 +22,16 @@ public class CustomerService {
     return customerRepository.findAll();
   }
 
-  public Optional<Optional<CustomerModel>> findById(Long id) {
-    Optional<CustomerModel> customer = customerRepository.findById((id));
-    if (!customer.isPresent()) {
-      return Optional.empty();
-    }
-    return Optional.of(customerRepository.findById(id));
+  public CustomerModel findById(Long id) {
+    return customerRepository.findById((id)).orElseThrow(
+        () -> new CustomerNotFoundException("Customer not found by this id!"));
   }
 
-  public Optional<CustomerModel> save(CustomerDTO dto) {
+  public CustomerModel save(CustomerDTO dto) {
     if (customerRepository.existsByCpf(dto.getCpf())) {
-      return Optional.empty();
+      throw new CustomerConflictException("This CPF Already Exist!");
     }
     CustomerModel user = new CustomerModel(dto);
-    return Optional.of(customerRepository.save(user));
+    return customerRepository.save(user);
   }
 }

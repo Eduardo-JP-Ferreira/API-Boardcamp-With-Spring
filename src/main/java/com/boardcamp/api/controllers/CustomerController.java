@@ -9,8 +9,6 @@ import com.boardcamp.api.services.CustomerService;
 
 import jakarta.validation.Valid;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,23 +33,13 @@ public class CustomerController {
 
   @GetMapping("/{id}")
   public ResponseEntity<Object> getCustomersById(@PathVariable("id") Long id) {
-    Optional<Optional<CustomerModel>> customer = customerService.findById(id);
-
-    if (!customer.isPresent()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).body(customer.get());
+    CustomerModel customer = customerService.findById(id);
+    return ResponseEntity.status(HttpStatus.OK).body(customer);
   }
 
   @PostMapping
   public ResponseEntity<Object> createCustomer(@RequestBody @Valid CustomerDTO body) {
-    Optional<CustomerModel> customer = customerService.save(body);
-
-    if (!customer.isPresent()) {
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("This CPF Already Exist");
-    }
-
+    CustomerModel customer = customerService.save(body);
     return ResponseEntity.status(HttpStatus.CREATED).body(customer);
   }
 }
