@@ -44,7 +44,7 @@ public class RentalService {
     GameModel gameModel = game.get();
     CustomerModel customerModel = customer.get();
 
-    List<RentalModel> gameRentals = rentalRepository.findByGameId(dto.getGameId());
+    List<RentalModel> gameRentals = rentalRepository.findByGameIdAndReturnDateIsNull(dto.getGameId());
 
     if (gameRentals.size() == gameModel.getStockTotal()) {
       return Optional.empty();
