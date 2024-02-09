@@ -70,7 +70,8 @@ class UnitTests {
 
   @Test
   void givenRepeteadName_whenCreatingNewGame_thenThrowsError() {
-    GameDTO dto = new GameDTO("Jogo", "http://www.imagem.com.br/banco_imobiliario.jpg", 1, 2000);
+    GameDTO dto = new GameDTO("Jogo",
+        "http://www.imagem.com.br/banco_imobiliario.jpg", 1, (long) 2000);
 
     doReturn(true).when(gameRepository).existsByName(any());
 
