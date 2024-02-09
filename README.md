@@ -32,3 +32,9 @@ https://github.com/Eduardo-JP-Ferreira/API-Boardcamp-With-Spring.git
 4. Run the aplication.
 
 ## How to Run Tests
+
+1. Create a Local PostgreSQL DB for tests in your machine
+
+2. Populate `.env.test` file based on `.env.test.example`.
+
+3. Run the desired test file.
