@@ -1,6 +1,7 @@
 package com.boardcamp.api.services;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,5 +56,29 @@ public class RentalService {
     rental.setRentDate(LocalDate.now());
 
     return Optional.of(rentalRepository.save(rental));
+  }
+
+  public Optional<RentalModel> update(Long id) {
+
+    Optional<RentalModel> rental = rentalRepository.findById(id);
+
+    if (!rental.isPresent()) {
+      return Optional.empty();
+    }
+
+    RentalModel rentalModel = rental.get();
+
+    if (rentalModel.getReturnDate() != null) {
+      return Optional.empty();
+    }
+
+    rentalModel.setReturnDate(LocalDate.now());
+
+    long daysDifference = ChronoUnit.DAYS.between(rentalModel.getRentDate(), LocalDate.now());
+    if (daysDifference > rentalModel.getDaysRented()) {
+      rentalModel.setDelayFee((daysDifference - rentalModel.getDaysRented()) * rentalModel.getGame().getPricePerDay());
+    }
+
+    return Optional.of(rentalRepository.save(rentalModel));
   }
 }

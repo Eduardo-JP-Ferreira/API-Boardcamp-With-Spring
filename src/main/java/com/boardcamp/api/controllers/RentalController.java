@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/rentals")
@@ -41,5 +43,16 @@ public class RentalController {
     }
 
     return ResponseEntity.status(HttpStatus.CREATED).body(rental);
+  }
+
+  @PutMapping("/{id}/return")
+  public ResponseEntity<Object> updateRental(@PathVariable Long id) {
+    Optional<RentalModel> rental = rentalService.update(id);
+
+    if (!rental.isPresent()) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("Was not possible finish the rent");
+    }
+
+    return ResponseEntity.status(HttpStatus.OK).body(rental);
   }
 }
